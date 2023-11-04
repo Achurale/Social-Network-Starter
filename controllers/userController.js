@@ -58,6 +58,8 @@ module.exports = {
             const user = await User.findOne({_id: req.params.id})
             const friend = await User.findOne({_id: req.params.friendId})
 
+            if(!user.friends.includes(req.params.friendId) || !friend.friends.includes(req.params.id)){
+
             console.log(user.username, 'and', friend.username, 'are becoming friends.')
 
             const nowFriends = await User.findOneAndUpdate(
@@ -72,6 +74,10 @@ module.exports = {
                 {new: true}
             )
             res.status(200).json(nowFriends)
+            } else {
+                console.log(user.username, "and", friend.username, 'are already friends.')
+                res.status(400).json()
+            }
         } catch (err) {
             console.log(err)
             res.status(500).json(err)
@@ -80,6 +86,13 @@ module.exports = {
     // Delete friend?
     async deleteFriend (req, res) {
         try{
+            const user = await User.findOne({_id: req.params.id})
+            const friend = await User.findOne({_id: req.params.friendId})
+
+            console.log(user.username, 'and', friend.username, 'are no longer friends.')
+
+            const deleteFriend = await User.findOneAnd
+
             res.status(200).json()
         } catch (err) {
             res.status(500).json(err)
