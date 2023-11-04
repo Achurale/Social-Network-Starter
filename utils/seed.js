@@ -17,4 +17,6 @@ connection.once('open', async () => {
     await Thought.collection.insertMany(thoughtSeed)
 
     console.log('Collection seeded successfully')
+    console.log('Closing connection')
+    connection.close()
 })
