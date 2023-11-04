@@ -89,11 +89,27 @@ module.exports = {
             const user = await User.findOne({_id: req.params.id})
             const friend = await User.findOne({_id: req.params.friendId})
 
+            if(user.friends.includes(req.params.friendId) || friend.friends.includes(req.params.id)){
             console.log(user.username, 'and', friend.username, 'are no longer friends.')
 
-            const deleteFriend = await User.findOneAnd
+            const deleteFriend = await User.findOneAndUpdate(
+                {_id: req.params.id},
+                {$pull: {friends: req.params.friendId}},
+                {new: true}
+            )
 
-            res.status(200).json()
+            const deleteFriend2 = await User.findOneAndUpdate(
+                {_id: req.params.friendId},
+                {$pull: {friends: req.params.id}},
+                {new: true}
+            )
+
+            res.status(200).json(deleteFriend)
+        } else {
+            console.log(user, 'and', friend, 'are not currently friends.')
+            res.status(400).json()
+        }
+
         } catch (err) {
             res.status(500).json(err)
         }
