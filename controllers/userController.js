@@ -55,7 +55,21 @@ module.exports = {
     // Add friend?
     async addFriend (req, res) {
         try{
-            res.status(200).json()
+            const user = await User.findOne({_id: req.params.id})
+            const friend = await User.findOne({_id: req.params.friendId})
+
+            const nowFriends = User.findOneAndUpdate(
+                {_id: req.params.id},
+                {$push: {friends: req.params.friendId}},
+                {new: true}
+            )
+
+            const nowFriends2 = User.findOneAndUpdate(
+                {_id: req.params.friendId},
+                {$push: {friends: req.params.id}},
+                {new: true}
+            )
+            res.status(200).json(nowFriends)
         } catch (err) {
             res.status(500).json(err)
         }
