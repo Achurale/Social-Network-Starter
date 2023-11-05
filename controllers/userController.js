@@ -58,26 +58,58 @@ module.exports = {
             const user = await User.findOne({_id: req.params.id})
             const friend = await User.findOne({_id: req.params.friendId})
 
-            const nowFriends = User.findOneAndUpdate(
+            if(!user.friends.includes(req.params.friendId) || !friend.friends.includes(req.params.id)){
+
+            console.log(user.username, 'and', friend.username, 'are becoming friends.')
+
+            const nowFriends = await User.findOneAndUpdate(
                 {_id: req.params.id},
                 {$push: {friends: req.params.friendId}},
                 {new: true}
             )
 
-            const nowFriends2 = User.findOneAndUpdate(
+            const nowFriends2 = await User.findOneAndUpdate(
                 {_id: req.params.friendId},
                 {$push: {friends: req.params.id}},
                 {new: true}
             )
             res.status(200).json(nowFriends)
+            } else {
+                console.log(user.username, "and", friend.username, 'are already friends.')
+                res.status(400).json()
+            }
         } catch (err) {
+            console.log(err)
             res.status(500).json(err)
         }
     },
     // Delete friend?
     async deleteFriend (req, res) {
         try{
-            res.status(200).json()
+            const user = await User.findOne({_id: req.params.id})
+            const friend = await User.findOne({_id: req.params.friendId})
+
+            if(user.friends.includes(req.params.friendId) || friend.friends.includes(req.params.id)){
+            console.log(user.username, 'and', friend.username, 'are no longer friends.')
+
+            const deleteFriend = await User.findOneAndUpdate(
+                {_id: req.params.id},
+                {$pull: {friends: req.params.friendId}},
+                {new: true}
+            )
+
+            const deleteFriend2 = await User.findOneAndUpdate(
+                {_id: req.params.friendId},
+                {$pull: {friends: req.params.id}},
+                {new: true}
+            )
+
+            res.status(200).json(deleteFriend)
+        } else {
+            console.log(user, 'and', friend, 'are not currently friends.')
+            res.status(400).json()
+        }
+
         } catch (err) {
             res.status(500).json(err)
         }
